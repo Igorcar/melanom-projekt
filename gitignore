@@ -1,0 +1,9 @@
+# podaci se ne stavljaju na GitHub (preuzimaju se s izvora)
+data/
+data_split/
+
+# razvojna verzija i privremene datoteke
+arhiva_v1/
+__pycache__/
+.ipynb_checkpoints/
+runs/melanom_probni/
