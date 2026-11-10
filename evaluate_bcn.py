@@ -2,14 +2,14 @@
 # ZAVRŠNI NEOVISNI TEST na BCN20000 (Barcelona) – skup koji nikad prije nije gledan
 # Isti model i ISTI prag (prag.json, izabran na HAM validaciji). Jedna slika po leziji (popis iz bilježnice).
 #
-import json
-from pathlib import Path
+import json                                   # čitanje praga
+from pathlib import Path                      # putanje
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import torch
-from torch.utils.data import DataLoader
-from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt               # grafovi
+import pandas as pd                           # tablice
+import torch                                  # PyTorch
+from torch.utils.data import DataLoader       # batchevi slika
+from sklearn.metrics import roc_curve, roc_auc_score   # ROC i AUC
 
 from evaluate_melanom import load_model, get_eval_transform, izracunaj_metrike, nacrtaj_matricu, MELANOM, PRAG_PATH
 from evaluate_hiba import HibaDataset      # isti Dataset: radi za svaku tablicu sa stupcima isic_id i oznaka
@@ -18,27 +18,27 @@ from evaluate_hiba import HibaDataset      # isti Dataset: radi za svaku tablicu
 #
 # GLOBALNE POSTAVKE
 #
-BCN_DIR = Path("data") / "bcn20000"
-BCN_POPIS = Path("rezultati") / "eda" / "bcn_test_popis.csv"
-HAM_TEST_PRED = Path("rezultati") / "evaluacija" / "predikcije_test.csv"
-HIBA_PRED = Path("rezultati") / "hiba" / "predikcije_hiba.csv"
-REZ_DIR = Path("rezultati") / "bcn"
+BCN_DIR = Path("data") / "bcn20000"                                        # BCN slike
+BCN_POPIS = Path("rezultati") / "eda" / "bcn_test_popis.csv"               # popis iz ćelije 10b
+HAM_TEST_PRED = Path("rezultati") / "evaluacija" / "predikcije_test.csv"   # za usporedni ROC
+HIBA_PRED = Path("rezultati") / "hiba" / "predikcije_hiba.csv"             # za usporedni ROC
+REZ_DIR = Path("rezultati") / "bcn"                                        # kamo spremamo rezultate
 BATCH_SIZE = 32
 NUM_WORKERS = 4
 
 
-@torch.no_grad()
+@torch.no_grad()                                                           # bez računanja gradijenata
 def predict_bcn(model, bcn, device):
-    putanje = {p.stem: p for p in BCN_DIR.rglob("*.jpg")}
-    ds = HibaDataset(bcn, putanje, get_eval_transform())
+    putanje = {p.stem: p for p in BCN_DIR.rglob("*.jpg")}                  # kazalo: isic_id -> putanja
+    ds = HibaDataset(bcn, putanje, get_eval_transform())                   # skup slika
     loader = DataLoader(ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
 
     vjerojatnosti = []
-    for x, _ in loader:
-        logits = model(x.to(device))
-        vjerojatnosti.extend(torch.softmax(logits, dim=1)[:, MELANOM].cpu().tolist())
+    for x, _ in loader:                                                    # batch po batch
+        logits = model(x.to(device))                                       # 2 broja po slici
+        vjerojatnosti.extend(torch.softmax(logits, dim=1)[:, MELANOM].cpu().tolist())   # skor za melanom
 
-    bcn["p_melanom"] = vjerojatnosti
+    bcn["p_melanom"] = vjerojatnosti                                       # dopiši skor u tablicu
     return bcn
 
 
@@ -47,18 +47,18 @@ def main():
     REZ_DIR.mkdir(parents=True, exist_ok=True)
 
     with open(PRAG_PATH, encoding="utf-8") as f:
-        prag = json.load(f)["prag"]
+        prag = json.load(f)["prag"]                                        # ZAKLJUČANI prag s HAM validacije
     print(f"Prag iz {PRAG_PATH}: {prag:.4f}")
 
-    model = load_model(device)
-    bcn = predict_bcn(model, pd.read_csv(BCN_POPIS), device)
-    bcn["odluka"] = (bcn["p_melanom"] >= prag).astype(int)
+    model = load_model(device)                                             # isti model
+    bcn = predict_bcn(model, pd.read_csv(BCN_POPIS), device)               # skorovi za sve BCN lezije
+    bcn["odluka"] = (bcn["p_melanom"] >= prag).astype(int)                 # odluka uz zaključani prag
     print(f"BCN lezija: {len(bcn)} | melanoma: {bcn['oznaka'].sum()}")
 
     # 1) Ukupno: prag 0,5 i zaključani prag
     redovi = []
     for p in [0.5, prag]:
-        m = izracunaj_metrike(bcn, p)
+        m = izracunaj_metrike(bcn, p)                                      # iste formule kao za HAM
         m["skup"] = "BCN20000"
         redovi.append(m)
     ukupno = pd.DataFrame(redovi)
@@ -75,8 +75,8 @@ def main():
     for ime, df in [("HAM10000 test", pd.read_csv(HAM_TEST_PRED)),
                     ("HIBA (Buenos Aires)", pd.read_csv(HIBA_PRED)),
                     ("BCN20000 (Barcelona)", bcn)]:
-        fpr, tpr, _ = roc_curve(df["oznaka"], df["p_melanom"])
-        auc = roc_auc_score(df["oznaka"], df["p_melanom"])
+        fpr, tpr, _ = roc_curve(df["oznaka"], df["p_melanom"])            # točke krivulje
+        auc = roc_auc_score(df["oznaka"], df["p_melanom"])                # AUC
         plt.plot(fpr, tpr, label=f"{ime} (AUC = {auc:.3f})")
     plt.plot([0, 1], [0, 1], "--", color="gray", label="slučajni model")
     plt.xlabel("1 − specifičnost")
@@ -95,9 +95,9 @@ def main():
     plt.close()
 
     # 5) Predikcije po leziji
-    bcn.to_csv(REZ_DIR / "predikcije_bcn.csv", index=False)
+    bcn.to_csv(REZ_DIR / "predikcije_bcn.csv", index=False)               # spremi tablicu
     print(f"\nSpremljeno u {REZ_DIR}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":     # pokreće se samo kad skriptu pokrenemo izravno
     main()

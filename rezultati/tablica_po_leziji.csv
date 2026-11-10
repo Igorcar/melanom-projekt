@@ -1,0 +1,3 @@
+﻿skup,lezija,melanoma (lezija),AUC,osjetljivost,osj. 95 % CI,specifičnost,spec. 95 % CI,preciznost,TP,FN,TN,FP
+HAM10000 test – po leziji,1121,92,0.926,0.902,0.824–0.948,0.75,0.723–0.776,0.244,83,9,772,257
+HIBA – po leziji,1201,159,0.816,0.704,0.629–0.770,0.777,0.751–0.802,0.326,112,47,810,232
