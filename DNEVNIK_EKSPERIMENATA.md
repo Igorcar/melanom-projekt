@@ -79,3 +79,43 @@ Nakon uređivanja bilježnice (dodani su samo komentari, logika je ista) ponovno
 - Isti model (epoha 6, val AUC 0,9017) i ponovno izabran **isti prag 0,2894**.
 - Svi rezultati **identični** prethodnima: HAM test 147 / 19 / 901 / 437, HIBA 141 / 55 / 834 / 250, BCN20000 305 / 390 / 3 652 / 501; isti AUC-ovi i intervali pouzdanosti.
 - Ništa nije podešavano. Ponovljen je isti postupak, pa ponovno pokretanje ne narušava neovisnost BCN20000 testa.
+
+---
+
+## Unaprijed zapisane usporedbe (11. 11. 2026., PRIJE pokretanja)
+
+Nakon recenzija R9–R14 dogovorene su tri usporedbe. Zapisane su ovdje prije nego što je ijedna pokrenuta. **Glavni model (epoha 6) i prag 0,2894 ostaju glavni rezultat bez obzira na ishod usporedbi.**
+
+| usporedba | što se mijenja | sve ostalo |
+|---|---|---|
+| **Osnovna linija** | logistička regresija na histogramu boja (24 značajke: 8 razreda × R, G, B), `class_weight="balanced"` | isti HAM trening / validacija / test |
+| **Zamrznuta mreža** | ResNet-18, uči se samo zadnji sloj (512 → 2), stopa učenja 1e-3 | ista augmentacija, težine klasa, 10 epoha, najbolja epoha po val AUC-u |
+| **Dva dodatna seeda** | seed treninga 123 i 2024 (podjela podataka ostaje seed 42) | sve isto kao glavni model |
+
+**Pravila:**
+- Za svaki model prag se bira istim pravilom na HAM validaciji (najviši prag uz osjetljivost ≥ 95 %).
+- Modeli se **uspoređuju na validaciji**. Rezultati na HAM testu, HIBA-i i BCN-u samo se prikazuju i **ne služe za odabir modela**, jer su ti skupovi već viđeni.
+- Seedovi se izvješćuju kao srednja vrijednost ± SD (glavni model + 2 seeda).
+- Usporedni modeli spremaju se u zasebne mape (`runs/usporedba_*`, `rezultati/usporedba/`); glavni model i `prag.json` se ne diraju.
+
+**Dodatne analize bez treniranja (isti dan):** tablica osjetljivosti i specifičnosti za više pragova (eksploratorno, ne bira se novi prag), Brier score, Grad-CAM na BCN-u, i usporedba jedinica evaluacije (prva slika / nasumična slika / prosjek po leziji) na sva tri skupa. Za posljednju se računa skor za sve BCN slike (17 157). Glavni BCN rezultat ostaje prva slika po leziji.
+
+---
+
+## Rezultati usporedbi i dodatnih analiza (11.–12. 11. 2026.)
+
+Sve je pokrenuto prema gornjem zapisu. Glavni model i prag nisu mijenjani; kontrolna evaluacija glavnog modela ponovno je dala prag 0,2894 i iste brojeve.
+
+| model | najbolja epoha | prag (val) | AUC val | AUC test | AUC HIBA | AUC BCN | osj. test | osj. BCN |
+|---|---|---|---|---|---|---|---|---|
+| logistička regresija (boje) | – | 0,3505 | 0,777 | 0,722 | 0,660 | 0,602 | 0,843 | 0,986* |
+| zamrznuti ResNet-18 | 8 | 0,3455 | 0,852 | 0,826 | 0,733 | 0,639 | 0,898 | 0,632 |
+| glavni (seed 42) | 6 | 0,2894 | 0,902 | 0,894 | 0,823 | 0,754 | 0,886 | 0,439 |
+| seed 123 | 5 | 0,2803 | 0,916 | 0,895 | 0,818 | 0,728 | 0,855 | 0,479 |
+| seed 2024 | 7 | 0,1393 | 0,912 | 0,920 | 0,820 | 0,685 | 0,946 | 0,432 |
+
+\* uz specifičnost 0,022 – model na bojama na BCN-u označava gotovo sve.
+
+**Zaključci (na validaciji):** fino podešavanje cijele mreže bolje je od zamrznute mreže i od osnovne linije. Glavni model nije najbolji od tri seeda na validaciji, pa nije biran prema rezultatu. Prag je osjetljiv na slučajnost treninga.
+
+**Dodatne analize:** BCN nasumična slika po leziji ≈ prva slika (osj. 0,453 / 0,439); prosjek po leziji AUC 0,782, osj. 0,472. Kontrola: skor prve slike u ponovnom izračunu identičan završnom testu (razlika 0,0). Brier: HAM 0,152 (ref. 0,098), HIBA 0,136 (0,130), BCN 0,116 (0,123).

@@ -7,3 +7,5 @@ arhiva_v1/
 __pycache__/
 .ipynb_checkpoints/
 runs/melanom_probni/
+# usporedni modeli (po ~45 MB) – rezultati su u rezultati/usporedba/
+runs/usporedba_*/

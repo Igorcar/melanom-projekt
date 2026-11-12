@@ -1,0 +1,7 @@
+﻿,AUC,AUC,osjetljivost,osjetljivost,specificnost,specificnost
+,mean,std,mean,std,mean,std
+skup,,,,,,
+BCN20000,0.722,0.035,0.45,0.026,0.855,0.022
+HAM test,0.903,0.015,0.896,0.046,0.689,0.028
+HAM validacija,0.91,0.007,0.951,0.0,0.671,0.039
+HIBA,0.821,0.003,0.713,0.012,0.773,0.011
