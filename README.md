@@ -102,30 +102,32 @@ Model iz 6. epohe (val AUC 0,902). Zaključani prag = **0,289**. Postupak je **r
 | TP / FN / TN / FP | 147 / 19 / 901 / 437 | 141 / 55 / 834 / 250 | 305 / 390 / 3 652 / 501 |
 | upućivanja po pronađenom melanomu | 4,0 | 2,8 | 2,6 |
 
-95 % CI: Wilsonova metoda; intervali po slici ne uzimaju u obzir da slike iste lezije (i lezije istog pacijenta) nisu neovisne, pa su okvirni. Preciznost ovisi i o udjelu melanoma u skupu. Upućivanja po melanomu = (TP + FP) / TP. Tablica: `rezultati/objedinjena_tablica.csv`.
+95 % CI: Wilsonova metoda; intervali po slici ne uzimaju u obzir da slike iste lezije (i lezije istog pacijenta) nisu neovisne, pa su okvirni; intervali koji uzorkuju cijele lezije ili pacijente su u ćeliji 13n (`rezultati/tablica_bootstrap.csv`). Preciznost ovisi i o udjelu melanoma u skupu. Upućivanja po melanomu = (TP + FP) / TP. Tablica: `rezultati/objedinjena_tablica.csv`.
 
 ![ROC s radnom točkom](rezultati/roc_radna_tocka.png)
 
 **Glavni nalaz:** dobar rezultat na testu iz istog izvora **ne jamči** jednak rad u drugoj ustanovi. Razlike u osjetljivosti su velike, ali ih treba tumačiti uz različit sastav skupova, različite jedinice evaluacije i ovisnost opažanja.
 
-**Prag nije držao ni na izvornom izvoru:** osjetljivost je na validaciji 95,1 %, a na HAM testu 88,6 %. Prag je odabran na samo 164 melanoma, pa i sam ima slučajnu nesigurnost.
+**Prag nije držao ni na izvornom izvoru:** osjetljivost je na validaciji 95,1 %, a na HAM testu 88,6 %. Prag je odabran na samo 164 melanoma, pa i sam ima slučajnu nesigurnost. Razlika validacija–test granično je značajna (Fisherov test po slikama p = 0,043).
+
+**AUC i osjetljivost govore različite stvari:** AUC mjeri koliko dobro model *poreda* melanome iznad ostalih i ne ovisi o pragu; osjetljivost ovisi o pragu. Na BCN-u je dio pada osjetljivosti posljedica praga, a pad AUC-a (0,894 → 0,754) nije. Rezultati su u skladu s pomakom domene i razlikom u sastavu skupova, ali ne dokazuju koji je uzrok presudan. Dio prednosti HAM testa u AUC-u dolazi od lakih negativnih primjera (praćeni nevusi snimljeni drugim uređajem – vidi niže, 13l i 13m); pad osjetljivosti uz zaključani prag na to ne ovisi.
 
 ### Ostali rezultati
 - **HAM10000 test, prag 0,5:** osjetljivost 0,837 (139/166), specifičnost 0,762. Odabrani prag pronalazi 8 melanoma više uz 119 lažnih uzbuna više.
 - **Po leziji** (prosjek skora slika iste lezije, isti prag): HAM test AUC 0,926, osjetljivost 0,902 (83/92), specifičnost 0,750; HIBA AUC 0,816, osjetljivost 0,704 (112/159), specifičnost 0,777. Slijede isti obrazac kao rezultati po slici.
 - **Lokalna prilagodba praga odluke na HIBA-i** (pacijenti podijeljeni na pola: polovica za odabir praga, polovica za provjeru): lokalni prag 0,067 umjesto 0,289 na provjernoj polovici vraća osjetljivost s 0,737 na **0,926**, ali specifičnost pada s 0,760 na 0,501. To je kompromis između propuštenih melanoma i lažnih uzbuna; rezultat je u skladu s pomakom domene, ali ga sam po sebi ne dokazuje, i ne zamjenjuje glavnu evaluaciju.
 - **Tip kože (HIBA):** osjetljivost I–II 0,740 (125/169), III–IV 0,647 (11/17; 95 % CI 0,41–0,83, premalo za zaključak); tipova V–VI nema.
-- **Skor pravih melanoma:** medijan HAM test 0,929, HIBA 0,650, BCN 0,227. Na BCN-u velik dio melanoma ima nizak skor. Snižavanje praga povećava osjetljivost (na BCN-u s 0,309 pri pragu 0,5 na 0,439 pri 0,289), ali uz više lažno pozitivnih nalaza; niži AUC pokazuje da problem nije samo u izboru praga. Mogući smjer poboljšanja je trening na podacima iz više ustanova.
+- **Skor pravih melanoma:** medijan HAM test 0,929, HIBA 0,650, BCN 0,227. Na BCN-u velik dio melanoma ima nizak skor. Snižavanje praga povećava osjetljivost (na BCN-u s 0,309 pri pragu 0,5 na 0,439 pri 0,289), ali uz više lažno pozitivnih nalaza; niži AUC pokazuje da problem nije samo u izboru praga. Trening na podacima iz više ustanova moguć je smjer poboljšanja – hipoteza koju ovaj projekt ne testira.
 - **Propušteni melanomi:** u opisnim tablicama nisu uočene velike razlike po spolu, a na BCN-u ni po regiji tijela (osjetljivost 0,42–0,46). Medijan dobi propuštenih je niži (pronađeni / propušteni: HAM 65 / 50, BCN 65 / 60), no na HAM-u je propuštenih samo 19, pa je to opis, a ne potvrđen nalaz.
-- **Kalibracija:** model precjenjuje rizik. Težine klasa mogu tome pridonijeti, ali njihov udio nije zasebno ispitan. Zato se izlaz zove **skor modela**, a ne vjerojatnost (u tablicama stupac `p_melanom`), i odluka se donosi pragom.
+- **Kalibracija:** model precjenjuje rizik. Težine klasa mogu tome pridonijeti, ali njihov udio nije zasebno ispitan. Zato se izlaz zove **skor modela**, a ne vjerojatnost (u tablicama stupac `p_melanom`), i odluka se donosi pragom. Iznimka su najniži skorovi na BCN-u, gdje je stvarni udio melanoma nešto viši od skora – nizak skor tamo ne znači sigurno benigno.
 - **Analiza pogrešaka:** model griješi sa sigurnošću (dio propuštenih melanoma ima skor ≈ 0). Velik dio lažnih uzbuna na HIBA-i su drugi karcinomi kože (BCC i SCC: 124 od 250).
-- **Grad-CAM** (HAM, HIBA i BCN): kod pogođenih melanoma model uglavnom gleda leziju, a kod propuštenih često nigdje ne nalazi dokaz za melanom. U pregledanom uzorku ne koristi mjerilo, rub dermatoskopa ni dlake. Grad-CAM pokazuje *gdje* model gleda, ali ne dokazuje da prepoznaje medicinski relevantne znakove.
+- **Grad-CAM** (HAM, HIBA i BCN; kvalitativno, 4 slike po skupini u svakom skupu): kod pogođenih melanoma model uglavnom gleda leziju, a kod propuštenih često nigdje ne nalazi dokaz za melanom. Na tom malom uzorku nije uočeno da koristi mjerilo, rub dermatoskopa ni dlake. Grad-CAM pokazuje *gdje* model gleda, ali ne dokazuje da prepoznaje medicinski relevantne znakove.
 
 ### Usporedni modeli (unaprijed zapisani u dnevniku, uspoređeni na validaciji)
 | model | AUC validacija | AUC HAM test | AUC HIBA | AUC BCN |
 |---|---|---|---|---|
 | logistička regresija na histogramu boja | 0,777 | 0,722 | 0,660 | 0,602 |
-| ResNet-18, zamrznut (uči se samo zadnji sloj) | 0,852 | 0,826 | 0,733 | 0,639 |
+| ResNet-18, zamrznut (uči se samo zadnji sloj; BatchNorm statistike se ipak prilagođavaju) | 0,852 | 0,826 | 0,733 | 0,639 |
 | **ResNet-18, cijela mreža – glavni model (seed 42)** | **0,902** | **0,894** | **0,823** | **0,754** |
 | ResNet-18, cijela mreža – 3 seeda (srednja vrijednost ± SD) | 0,910 ± 0,007 | 0,903 ± 0,015 | 0,821 ± 0,003 | 0,722 ± 0,035 |
 
@@ -135,33 +137,42 @@ Model iz 6. epohe (val AUC 0,902). Zaključani prag = **0,289**. Postupak je **r
 - **Prag je nestabilan između treninga:** isto pravilo dalo je pragove 0,289, 0,280 i 0,139, a osjetljivost na HAM testu 0,886, 0,855 i 0,946.
 - **Jedinica evaluacije:** na BCN-u nasumična slika po leziji daje gotovo isto kao prva slika (osjetljivost 0,453 prema 0,439), a prosjek svih slika lezije nešto više (AUC 0,782, osjetljivost 0,472).
 - **Više pragova:** na BCN-u ni prag 0,05 ne doseže 95 % osjetljivosti (0,773 uz specifičnost 0,578).
-- **Brier score:** HAM test 0,152 (referenca bez modela 0,098), HIBA 0,136 (0,130), BCN 0,116 (0,123); skor nije dobra procjena vjerojatnosti, iako model dobro razlikuje klase.
+- **Brier score:** HAM test 0,152 (referenca bez modela 0,098), HIBA 0,136 (0,130), BCN 0,116 (0,123). Brier mjeri ukupnu točnost skora kao vjerojatnosti (kalibraciju i razlučivanje zajedno), nije čista mjera kalibracije: na HAM-u je lošiji od reference, na HIBA-i približno jednak, na BCN-u malo bolji.
+
+### Provjere nakon neovisnih recenzija (13l–13o)
+- **Usporedivost skupova (13l):** na histološki potvrđenim lezijama AUC je HAM 0,819, HIBA 0,765, BCN 0,751 (svi: 0,894 / 0,823 / 0,754); melanom nasuprot operiranom nevusu 0,801 / 0,764 / 0,700. Velik dio prednosti HAM testa dolazi od nevusa bez histologije (u HAM-u praćenih digitalnom dermatoskopijom): na njima je specifičnost 0,911, a na operiranim nevusima 0,332. Na usporedivim lezijama razlika HAM–BCN u AUC-u pada s 0,14 na 0,07. Veći udio BCC-a ne objašnjava pad na BCN-u (bez BCC-a AUC je ondje 0,709, dakle niži); na HIBA-i BCC pridonosi (0,823 → 0,862 bez BCC-a). Osjetljivost se ne mijenja jer su svi melanomi histološki potvrđeni.
+- **Provjera prečaca (13m):** same boje (24 značajke, bez oblika) razlikuju praćene od operiranih nevusa u HAM testu s AUC **0,997**; skor modela s 0,984. Prema opisu skupa (Tschandl i sur., 2018) praćeni nevusi snimljeni su sustavom MoleMax HD. U HAM-u je način potvrde dijagnoze, a time i velik dio benignih slučajeva, gotovo savršeno povezan s izgledom snimke, pa je model mogao naučiti prečac „ovakva snimka = benigno”. To nije dokaz da ga koristi (operirani nevusi su i klinički sumnjiviji), ali je glavni HAM rezultat zato optimističan.
+- **Bootstrap intervali (13n, 1000×, po leziji za HAM i BCN, po pacijentu za HIBA):** osjetljivost HAM 0,815–0,949 (Wilson 0,828–0,925), HIBA 0,651–0,787, BCN 0,405–0,476; AUC HAM 0,860–0,927, HIBA 0,786–0,860, BCN 0,735–0,774. Intervali su malo širi, zaključci se ne mijenjaju.
+- **Neovisna provjera brojeva (13o):** matrica zabune i AUC ponovno izračunani bez sklearn-a – za sva tri skupa identični glavnoj tablici.
 
 Tablice: `rezultati/usporedba/`, `rezultati/tablica_pragova.csv`, `rezultati/tablica_protokola_lezija.csv`.
 
 ### Zaključak
 
-Model dobro radi na podacima iz istog izvora, ali u drugim ustanovama znatno slabije prepoznaje melanom, a prag odabran na izvornom skupu ne prenosi se. Rezultati upućuju na to da je **raznolikost podataka važnija od same mreže**. Model bi se prije svake primjene morao lokalno provjeriti i prilagoditi, a za pouzdan rad trenirati na podacima iz više ustanova.
+Model dobro radi na podacima iz istog izvora, ali u drugim ustanovama znatno slabije prepoznaje melanom, a prag odabran na izvornom skupu ne prenosi se. Model bi se prije svake primjene morao lokalno provjeriti i prilagoditi. Pretpostavka je da bi trening na podacima iz više ustanova pomogao više od promjene arhitekture, ali to je **hipoteza** – ovaj projekt je ne testira.
 
 Grafovi i tablice: mapa `rezultati/` (EDA, evaluacija, HIBA, BCN, analiza pogrešaka, Grad-CAM, dodatne analize, demo).
 
 ## 5. Ograničenja
 
-- Model je **binaran**: melanom nasuprot svemu ostalom. „Ostalo” uključuje i maligne promjene (BCC, SCC).
+- Model je **binaran**: melanom nasuprot svemu ostalom. „Ostalo” uključuje i maligne promjene: BCC, a u HIBA-i i BCN-u i SCC. HAM-ova skupina *akiec* obuhvaća aktiničku keratozu i Bowenovu bolest (nije isto što i SCC).
 - Retrospektivni javni podaci; HAM10000 pretežno svijetla koža (Austrija, Australija); tipovi kože V–VI nisu zastupljeni ni u vanjskim skupovima, a III–IV ima samo 17 melanoma.
 - Samo dermatoskopske slike; oznake nevusa u HAM10000 dijelom bez histološke potvrde.
 - HAM10000 nema `patient_id`: podjela po leziji, ne po pacijentu.
 - Prag je odabran na **jednom skupu** (HAM validacija, 164 melanoma) i ne prenosi se na druge ustanove.
 - **HAM test i HIBA viđeni su u razvojnoj verziji 1**; potpuno netaknut je samo BCN20000 (vidi `DNEVNIK_EKSPERIMENATA.md`).
 - Skor modela nije kalibrirana vjerojatnost.
-- Intervali pouzdanosti po slici ne uzimaju u obzir ovisnost slika iste lezije ili pacijenta.
+- Wilsonovi intervali po slici ne uzimaju u obzir ovisnost slika iste lezije ili pacijenta (bootstrap po lezijama ili pacijentima, 13n, daje gotovo iste intervale).
+- U HAM10000 nevusi bez histologije (praćeni) snimljeni su drugim uređajem; same boje ih od operiranih razlikuju s AUC 0,997 (13m) – mogući prečac koji glavni HAM rezultat čini optimističnim.
+- Brojevi slika i lezija odnose se na preuzete verzije metapodataka (ISIC Archive se mijenja) i mogu se razlikovati od brojeva u izvornim člancima.
+- BCN „prva slika po leziji” = prvi redak lezije u metapodatkovnoj tablici, redoslijedom kojim ga daje ISIC; nasumična slika i prosjek daju sličan rezultat (13k).
 - Usporedni modeli i dodatni seedovi su naknadne analize (vidi `DNEVNIK_EKSPERIMENATA.md`).
 - Model **nije validiran u stvarnom kliničkom radu** i ne zamjenjuje dermatologa ni patohistologiju.
 
 **Što bi se moglo poboljšati:**
-- trening na podacima iz više ustanova (npr. HAM + BCN + ISIC) i sa svim tipovima kože;
+- trening na podacima iz više ustanova (npr. HAM + BCN + ISIC) i sa svim tipovima kože, uz provjeru „jedna ustanova izostavljena”;
 - lokalna provjera i prilagodba praga u svakoj ustanovi prije uporabe;
-- kalibracija skora (npr. na lokalnim podacima), bootstrap intervali za AUC, unakrsna validacija;
+- kalibracija skora (npr. na lokalnim podacima), normalizacija boja, unakrsna validacija;
 - scheduler stope učenja, test-time augmentacija, novije arhitekture (EfficientNet, ConvNeXt) uz GPU;
 - ablacija (doprinos augmentacije i težina klasa) i više od tri seeda;
 - validacija u stvarnom kliničkom tijeku rada.
@@ -183,7 +194,7 @@ pip install -r requirements.txt
 3. `python train_melanom.py` – treniranje (najprije s `PROBNI_RAD = True`, zatim `False`; ~50 min na CPU). Model: `runs/melanom_resnet18/best_model.pt`.
 4. `python evaluate_melanom.py` – odabir praga na validaciji i jedna provjera na testu.
 5. `python evaluate_hiba.py` i `python evaluate_bcn.py` – vanjske provjere (BCN treba popis iz bilježnice, ćelija 10b).
-6. Bilježnica: lokalna prilagodba praga, analiza pogrešaka, Grad-CAM, dodatne analize (13b–13h) i demo.
+6. Bilježnica: lokalna prilagodba praga, analiza pogrešaka, Grad-CAM, dodatne analize (13b–13o) i demo.
 
 Spremljeni model (`runs/melanom_resnet18/best_model.pt`, ~45 MB) uključen je u repozitorij, pa se evaluacija i demo mogu pokrenuti bez treniranja.
 

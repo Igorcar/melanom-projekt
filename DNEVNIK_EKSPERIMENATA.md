@@ -21,7 +21,7 @@ Svrha: iskreno pokazati koji su skupovi podataka bili „viđeni” prije konač
 | HIBA | 0,622 (122/196) | 0,844 | 0,823 |
 
 **Što smo naučili:**
-- Prag biran *točno* na 90 % na validaciji na testu daje samo 84 %. Pravilu je nedostajala rezerva, jer osjetljivost na novim podacima uvijek malo padne.
+- Prag biran *točno* na 90 % na validaciji na testu daje samo 84 %. Pravilu je nedostajala rezerva: osjetljivost je s validacije na test pala i u v1 i u v2. To su samo dva mjerenja, a ne pravilo; pad u v2 granično je značajan (Fisher p = 0,043).
 - Na HIBA-i osjetljivost jako pada (pomak domene).
 
 **Što je viđeno:** HAM test i HIBA. BCN20000 **nije** bio otvoren (ni metapodaci ni slike).
@@ -119,3 +119,21 @@ Sve je pokrenuto prema gornjem zapisu. Glavni model i prag nisu mijenjani; kontr
 **Zaključci (na validaciji):** fino podešavanje cijele mreže bolje je od zamrznute mreže i od osnovne linije. Glavni model nije najbolji od tri seeda na validaciji, pa nije biran prema rezultatu. Prag je osjetljiv na slučajnost treninga.
 
 **Dodatne analize:** BCN nasumična slika po leziji ≈ prva slika (osj. 0,453 / 0,439); prosjek po leziji AUC 0,782, osj. 0,472. Kontrola: skor prve slike u ponovnom izračunu identičan završnom testu (razlika 0,0). Brier: HAM 0,152 (ref. 0,098), HIBA 0,136 (0,130), BCN 0,116 (0,123).
+
+## Neovisne recenzije R15–R18 (13.11.2026.)
+
+Četiri vanjske AI recenzije (Perplexity, DeepSeek, Gemini, Grok). Nijedna nije pronašla pogrešku koja poništava glavni rezultat; glavni model i prag se ne mijenjaju.
+
+**Prihvaćeno – ispravci formulacija:** „uvijek malo padne” (vidi gore); dijagram kalibracije nije „sav ispod dijagonale” (najniži skorovi na BCN-u su iznad); Brier nije čista mjera kalibracije; HAM *akiec* = aktinička keratoza + Bowenova bolest, ne SCC; „raznolikost podataka važnija od mreže” i „trening na više ustanova je rješenje” su hipoteze; AUC (ne ovisi o pragu) odvojen od osjetljivosti (ovisi); definirana „prva slika” na BCN-u; brojevi slika vezani uz preuzetu verziju metapodataka; zamrznuta mreža ažurira BatchNorm statistike.
+
+**Prihvaćeno – nove naknadne analize (13l–13o):** AUC u podskupinama (histološki potvrđeni; melanom nasuprot nevusu), provjera prečaca bojama (praćeni nasuprot operiranim nevusima), bootstrap intervali po lezijama/pacijentima, neovisni ponovni izračun glavnih brojeva. Sve su opisne i ne mijenjaju model ni prag.
+
+**Odbačeno:** tvrdnja o curenju podataka zbog podjele po slici (netočno – podjela je po `lesion_id` uz provjeru preklapanja); „protokol prve slike objašnjava pad na BCN-u” (već provjereno u 13k: i po leziji ostaje isti jaz); normalizacija boja i „jedna ustanova izostavljena” (novi trening nakon gledanja vanjskih rezultata – samo budući rad).
+
+**Rezultati 13l–13o (14.11.2026.):**
+- **Usporedivost skupova (13l):** na histološki potvrđenim lezijama AUC je HAM 0,819, HIBA 0,765, BCN 0,751 (svi: 0,894 / 0,823 / 0,754); melanom nasuprot operiranom nevusu 0,801 / 0,764 / 0,700. Velik dio prednosti HAM testa dolazi od nevusa bez histologije (u HAM-u praćenih digitalnom dermatoskopijom): na njima je specifičnost 0,911, a na operiranim nevusima 0,332. Na usporedivim lezijama razlika HAM–BCN u AUC-u pada s 0,14 na 0,07. Veći udio BCC-a ne objašnjava pad na BCN-u (bez BCC-a AUC je ondje 0,709, dakle niži); na HIBA-i BCC pridonosi (0,823 → 0,862 bez BCC-a). Osjetljivost se ne mijenja jer su svi melanomi histološki potvrđeni.
+- **Provjera prečaca (13m):** same boje (24 značajke, bez oblika) razlikuju praćene od operiranih nevusa u HAM testu s AUC **0,997**; skor modela s 0,984. Prema opisu skupa (Tschandl i sur., 2018) praćeni nevusi snimljeni su sustavom MoleMax HD. U HAM-u je način potvrde dijagnoze, a time i velik dio benignih slučajeva, gotovo savršeno povezan s izgledom snimke, pa je model mogao naučiti prečac „ovakva snimka = benigno”. To nije dokaz da ga koristi (operirani nevusi su i klinički sumnjiviji), ali je glavni HAM rezultat zato optimističan.
+- **Bootstrap intervali (13n, 1000×, po leziji za HAM i BCN, po pacijentu za HIBA):** osjetljivost HAM 0,815–0,949 (Wilson 0,828–0,925), HIBA 0,651–0,787, BCN 0,405–0,476; AUC HAM 0,860–0,927, HIBA 0,786–0,860, BCN 0,735–0,774. Intervali su malo širi, zaključci se ne mijenjaju.
+- **Neovisna provjera brojeva (13o):** matrica zabune i AUC ponovno izračunani bez sklearn-a – za sva tri skupa identični glavnoj tablici.
+
+**Tumačenje:** glavni klinički nalaz (pad osjetljivosti uz zaključani prag) ostaje. Najvažniji novi nalaz je mogući prečac u HAM10000: praćeni nevusi (drugi uređaj) prepoznaju se već po bojama, pa je glavni HAM rezultat optimističan, a stvarna razlika među skupovima u AUC-u manja nego što glavna tablica pokazuje. Model i prag se ne mijenjaju (bilo bi naknadno podešavanje).

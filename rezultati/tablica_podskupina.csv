@@ -1,0 +1,16 @@
+﻿skup,podskupina,slika,melanoma,ostalih,AUC,specifičnost,spec. 95 % CI
+HAM10000 test,svi (glavni rezultat),1504,166,1338,0.894,0.673,0.648–0.698
+HAM10000 test,samo histološki potvrđeni,759,166,593,0.819,0.425,0.386–0.465
+HAM10000 test,melanom nasuprot nevusu,1169,166,1003,0.911,0.715,0.686–0.742
+HAM10000 test,melanom nasuprot histo-nevusu,506,166,340,0.801,0.332,0.284–0.384
+HAM10000 test,melanom nasuprot praćenom nevusu,829,166,663,0.967,0.911,0.887–0.930
+HIBA,svi (glavni rezultat),1280,196,1084,0.823,0.769,0.743–0.793
+HIBA,samo histološki potvrđeni,762,196,566,0.765,0.654,0.614–0.692
+HIBA,melanom nasuprot nevusu,751,196,555,0.862,0.843,0.811–0.871
+HIBA,melanom nasuprot histo-nevusu,349,196,153,0.764,0.654,0.575–0.724
+HIBA,melanom nasuprot praćenom nevusu,598,196,402,0.898,0.915,0.884–0.939
+BCN20000,svi (glavni rezultat),4848,695,4153,0.754,0.879,0.869–0.889
+BCN20000,samo histološki potvrđeni,3513,695,2818,0.751,0.875,0.862–0.886
+BCN20000,melanom nasuprot nevusu,2399,695,1704,0.709,0.868,0.851–0.883
+BCN20000,melanom nasuprot histo-nevusu,1814,695,1119,0.7,0.859,0.837–0.878
+BCN20000,melanom nasuprot praćenom nevusu,1280,695,585,0.724,0.885,0.857–0.909
