@@ -145,11 +145,11 @@ Model iz 6. epohe (val AUC 0,902). Zaključani prag = **0,289**. Postupak je **r
 - **Bootstrap intervali (13n, 1000×, po leziji za HAM i BCN, po pacijentu za HIBA):** osjetljivost HAM 0,815–0,949 (Wilson 0,828–0,925), HIBA 0,651–0,787, BCN 0,405–0,476; AUC HAM 0,860–0,927, HIBA 0,786–0,860, BCN 0,735–0,774. Intervali su malo širi, zaključci se ne mijenjaju.
 - **Neovisna provjera brojeva (13o):** matrica zabune i AUC ponovno izračunani bez sklearn-a – za sva tri skupa identični glavnoj tablici.
 
-Tablice: `rezultati/usporedba/`, `rezultati/tablica_pragova.csv`, `rezultati/tablica_protokola_lezija.csv`.
+Tablice: `rezultati/usporedba/`, `rezultati/tablica_pragova.csv`, `rezultati/tablica_protokola_lezija.csv`, `rezultati/tablica_podskupina.csv`, `rezultati/provjera_precaca.csv`, `rezultati/tablica_bootstrap.csv`.
 
 ### Zaključak
 
-Model dobro radi na podacima iz istog izvora, ali u drugim ustanovama znatno slabije prepoznaje melanom, a prag odabran na izvornom skupu ne prenosi se. Model bi se prije svake primjene morao lokalno provjeriti i prilagoditi. Pretpostavka je da bi trening na podacima iz više ustanova pomogao više od promjene arhitekture, ali to je **hipoteza** – ovaj projekt je ne testira.
+Model dobro radi na podacima iz istog izvora, ali u drugim ustanovama znatno slabije prepoznaje melanom, a prag odabran na izvornom skupu ne prenosi se. Ni rezultat na HAM testu nije sasvim pošten: dio ga čine laki negativni primjeri (praćeni nevusi snimljeni drugim uređajem, mogući prečac – 13m), pa je na usporedivim, histološki potvrđenim lezijama razlika među skupovima upola manja. Model bi se prije svake primjene morao lokalno provjeriti i prilagoditi. Pretpostavka je da bi trening na podacima iz više ustanova pomogao više od promjene arhitekture, ali to je **hipoteza** – ovaj projekt je ne testira.
 
 Grafovi i tablice: mapa `rezultati/` (EDA, evaluacija, HIBA, BCN, analiza pogrešaka, Grad-CAM, dodatne analize, demo).
 
