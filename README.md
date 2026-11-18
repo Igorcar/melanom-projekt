@@ -186,7 +186,7 @@ conda activate melanom
 pip install -r requirements.txt
 ```
 
-**Demo bez treniranja** (spremljeni model je u repozitoriju, radi bez interneta): u bilježnici `melanom_v2.ipynb` pokrenuti **ćeliju 1**, zatim **ćeliju 11 (Demo)**. Potrebne su slike u `data/` i datoteke u `rezultati/`.
+**Demo bez treniranja** (spremljeni model je u repozitoriju, radi bez interneta): u bilježnici `melanom.ipynb` pokrenuti **ćeliju 1**, zatim **ćeliju 11 (Demo)**. Potrebne su slike u `data/` i datoteke u `rezultati/`.
 
 **Cijeli postupak od početka** (bilježnica vodi kroz sve korake):
 1. Preuzmi podatke u mapu `data/` (vidi poglavlje 2).
@@ -201,7 +201,7 @@ Spremljeni model (`runs/melanom_resnet18/best_model.pt`, ~45 MB) uključen je u 
 ## 7. Struktura repozitorija
 
 ```
-melanom_v2.ipynb          bilježnica: EDA, pokretanje skripti, analize, Grad-CAM, demo, zaključak
+melanom.ipynb             bilježnica: EDA, pokretanje skripti, analize, Grad-CAM, demo, zaključak
 podijeli_ham.py           podjela HAM10000 po leziji
 train_melanom.py          treniranje ResNet-18
 evaluate_melanom.py       prag na validaciji + test
