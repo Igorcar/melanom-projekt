@@ -215,3 +215,14 @@ DNEVNIK_EKSPERIMENATA.md  što je kada napravljeno i viđeno (v1 → v2 → doda
 runs/melanom_resnet18/    best_model.pt, TensorBoard zapisi
 rezultati/                grafovi, tablice, predikcije, prag.json, podjela_ham.csv
 ```
+
+## Licenca i uporaba
+
+Edukacijski projekt bez komercijalne namjene. Model nije medicinski proizvod
+i nije namijenjen kliničkoj uporabi.
+
+Primjeri slika i iz njih izvedeni prikazi u mapi rezultati/ (primjeri iz EDA-e,
+Grad-CAM, demo) potječu iz skupova HAM10000 (Tschandl i sur., 2018; CC BY-NC 4.0),
+HIBA Skin Lesions (Hospital Italiano de Buenos Aires; CC BY) i BCN20000
+(Hospital Clínic de Barcelona; CC BY-NC) i ostaju pod licencama izvornih skupova.
+Svi podaci su javni i anonimizirani kod izvora.
